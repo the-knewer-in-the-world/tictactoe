@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/<your-username>/tictactoe-docker.git'
+                git 'https://github.com/the-knewer-in-the-world/tictactoe.git'
             }
         }
 
