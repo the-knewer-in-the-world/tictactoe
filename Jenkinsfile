@@ -4,7 +4,9 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/the-knewer-in-the-world/tictactoe.git'
+                git branch: 'main', url: 'https://github.com/the-knewer-in-the-world/tictactoe.git'
+
+                
             }
         }
 
