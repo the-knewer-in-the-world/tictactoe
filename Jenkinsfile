@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')   // Jenkins credential ID
-        DOCKERHUB_REPO = 'aditijadhav18/tictactoe'    // Replace with your repo
+        DOCKERHUB_REPO = 'aditijadhav18/tictactoe'
     }
 
     stages {
@@ -30,8 +29,10 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                script {
-                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred',
+                                                 usernameVariable: 'DOCKER_USER',
+                                                 passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
@@ -48,7 +49,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 5000:5000 --name tictactoe-container aditijadhav18/tictactoe:latest'
+                sh '''
+                  docker rm -f tictactoe-container || true
+                  docker run -d -p 5000:5000 --name tictactoe-container ${DOCKERHUB_REPO}:latest
+                '''
             }
         }
     }
