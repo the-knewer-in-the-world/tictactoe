@@ -4,29 +4,26 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/the-knewer-in-the-world/tictactoe.git'
-
-                
+                git branch: 'main',
+                    url: 'https://github.com/the-knewer-in-the-world/tictactoe.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("tictactoe-app")
+                    dockerImage = docker.build("aditijadhav18/tictactoe")
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Push to DockerHub') {
             steps {
-                sh 'docker run --rm tictactoe-app python -m unittest discover -s tests'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh 'docker run -d -p 5000:5000 --name tictactoe tictactoe-app'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
+                        dockerImage.push("latest")
+                    }
+                }
             }
         }
     }
